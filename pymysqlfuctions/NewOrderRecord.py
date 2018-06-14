@@ -19,8 +19,19 @@ def NewOrderRecord(infolist):  #输入需要建立的订单，名字，模型
 #%%使用方法
 if __name__ == '__main__':
     import pandas as pd
-    a=['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity', 'quantity_filled', 'is_buy', 'is_open', 'exec_type', 'tif', 'status', 'trading_type', 'tradingday', 'errorcode']
-    data=[['13001','ovo20180613102201','11001','14001','1234','16','0','1','1','9','0','14','0','2018-09-01','0']]
-    infolist=pd.DataFrame(data,columns=a)
-    b=NewOrderRecord(infolist)            
+    import CreateOrder
+    ordername='oao127'
+    accountid='13001'
+    modelname='oao'
+    a=['exercise_type','exp_date','init_date','option_type','ref_contract','ref_exchange','ref_underlying','strike']
+    data=[['0','2018-06-13','2018-06-13','1','c1901','DCE','c','1820']]
+    paramlist=pd.DataFrame(data,columns=a)
+    b=CreateOrder.CreateOrder(ordername,modelname,accountid,paramlist)
+    print(b)
+    
+    c=['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity', 'quantity_filled', 'is_buy', 'is_open', 'exec_type', 'tif', 'status', 'trading_type', 'tradingday', 'errorcode']
+    d=[[accountid,ordername,'11001','14001','1234','16','0','1','1','9','0','14','0','2018-09-01','0']]
+    infolist=pd.DataFrame(d,columns=c)
+    e=NewOrderRecord(infolist)         
+    print(e)
 
