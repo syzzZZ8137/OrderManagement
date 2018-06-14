@@ -8,7 +8,7 @@ Created on Wed Jun 13 16:57:34 2018
 import PyMySQLreadZH
 #%%获取角色列表
 def GetOrderList(accountid):
-    strall="SELECT * FROM futurexdb.usermodels where  accountid ='"+accountid+"' and model in('ovo','oao');"
+    strall="SELECT * FROM futurexdb.order_record_otc where  accountid ='"+accountid+"';"
     a=PyMySQLreadZH.dbconn(strall)
     return a
 #%%使用方法
