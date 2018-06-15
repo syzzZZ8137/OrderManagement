@@ -1,0 +1,15 @@
+LabelName;;DataCurr;DataDownBound;DataUpBound;Step;DataType;Group
+Volatility Reference;;0.125;0;1000000;0.001;SpinBox;oao
+Volatility Change Rate;;0;-1000000;1000000;0.001;SpinBox;Volatility Settings
+Current Volatility;;0.24;NA;NA;NA;Label;Volatility Settings
+Slope Reference;;0.38;-1000000;1000000;0.01;SpinBox;Volatility Settings
+Slope Change Rate;;0;-1000000;1000000;0.01;SpinBox;Volatility Settings
+Current Slope;;0.38;NA;NA;NA;Label;Volatility Settings
+Put Curvature;;2.1;-1000000;1000000;0.01;SpinBox;Volatility Settings
+Call Curvature;;-2.3;-1000000;1000000;0.01;SpinBox;Volatility Settings
+Down Cutoff;;-0.055;-1000000;1000000;0.001;SpinBox;Volatility Settings
+Up Cutoff;;0.055;-1000000;1000000;0.001;SpinBox;Volatility Settings
+Down Smoothing Range;;1;0;1000000;0.01;SpinBox;Volatility Settings
+Up Smoothing Range;;1;0;1000000;0.01;SpinBox;Volatility Settings
+Down Slope;;0.0001;-1000000;1000000;0.001;SpinBox;Volatility Settings
+Up Slope;;0.0001;-1000000;1000000;0.001;SpinBox;Volatility Settings
