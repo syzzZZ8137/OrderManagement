@@ -12,4 +12,5 @@ def UpdateOrderStatus(changeitem,changevalue,accountid,modelinstance):
     outputstr='本次更改：'+accountid+' '+modelinstance+' '+changeitem+' 值至：'+changevalue+' 受到影响的行数: '+str(data)
     return outputstr                            #返回结果
 #%%使用方法
-    #a=UpdateOrderStatus('status','1','13001','oao-test-1')                
+    #a=UpdateOrderStatus('status','1','13001','oao-test-1')       
+    #a=UpdateOrderStatus('quantity_filled','1','13001','ovo124')          
