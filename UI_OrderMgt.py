@@ -218,7 +218,7 @@ def on_btn_ovo_clicked(p):
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
                         'tif', 'trading_type', 'tradingday', 'errorcode']
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
-                      str(is_buy),str(ex_t),'14','0','0',\
+                      str(is_buy),'9','14','0','0',\
                       '0','0',str(price_date.value),'0']]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
@@ -464,7 +464,7 @@ def on_btn_oao_clicked(p):
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
                         'tif', 'trading_type', 'tradingday', 'errorcode']
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
-                      str(is_buy),str(ex_t),'14','0','0',\
+                      str(is_buy),'9','14','0','0',\
                       '0','0',str(price_date.value),'0']]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
@@ -532,7 +532,7 @@ def on_btn_qw_clicked(p):
     
     def query_click(p):
         clear_output()
-        display(sales,withdrawl_order_id,tips,select)
+        display(sales,withdrawl_order_id,select)
         if sales.value=='无':
             print('请选择业务员ID')
         else:
@@ -542,7 +542,7 @@ def on_btn_qw_clicked(p):
             res = res[['accountid','customerid','modelinstance','price','quantity','is_buy','exec_type','status']]
             res.set_index('modelinstance',inplace=True)
             
-            order_id_lst = list(res[res['status'] == 14].index)
+            order_id_lst = list(res[res['status'].isin([1,3,5,6,14])].index)
             
             
             res_disp = pd.DataFrame()
@@ -561,9 +561,9 @@ def on_btn_qw_clicked(p):
             i = 0
             for each in order_id_lst:
                 res_disp.loc[i,'订单号'] = each
-                res_disp.loc[i,'客户ID'] = res.loc[each,'customerid']
-                res_disp.loc[i,'业务员ID'] = res.loc[each,'accountid']
-                res_disp.loc[i,'订单状态'] = res.loc[each,'status'] 
+                res_disp.loc[i,'客户ID'] = int(res.loc[each,'customerid'])
+                res_disp.loc[i,'业务员ID'] = int(res.loc[each,'accountid'])
+                #res_disp.loc[i,'订单状态'] = res.loc[each,'status'] 
                 res_disp.loc[i,'交易所'] = res2.loc[each,'ref_exchange']
                 res_disp.loc[i,'品种'] = res2.loc[each,'ref_underlying']
                 res_disp.loc[i,'合约'] = res2.loc[each,'ref_contract']
@@ -586,7 +586,19 @@ def on_btn_qw_clicked(p):
                 res_disp.loc[i,'行权价'] = res2.loc[each,'strike']
                 res_disp.loc[i,'期权手数'] = res.loc[each,'quantity']
                 res_disp.loc[i,'方向'] = '买入' if res.loc[each,'is_buy']==1 else '卖出'
-                res_disp.loc[i,'可撤'] = '是'  if res.loc[each,'status'] == 14 else '否'
+                if res.loc[each,'status'] == 14:
+                    res_disp.loc[i,'状态'] = '下单成功,等待审阅'
+                elif res.loc[each,'status'] == 6:
+                    res_disp.loc[i,'状态'] = '正在审阅'
+                elif res.loc[each,'status'] == 1:
+                    res_disp.loc[i,'状态'] = '已通过审阅'
+                elif res.loc[each,'status'] == 5:
+                    res_disp.loc[i,'状态'] = '未通过审阅'
+                elif res.loc[each,'status'] == 3:
+                    res_disp.loc[i,'状态'] = '已撤单'
+                else:
+                    pass
+                    
                 i+=1
             
             res_disp.index+=1
@@ -594,7 +606,7 @@ def on_btn_qw_clicked(p):
     
     def withdrawl_click(p):
         clear_output()
-        display(sales,withdrawl_order_id,tips,select)
+        display(sales,withdrawl_order_id,select)
         if sales.value=='无':
             print('请选择业务员ID')
         else:
