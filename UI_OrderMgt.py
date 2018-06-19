@@ -532,7 +532,7 @@ def on_btn_qw_clicked(p):
     
     def query_click(p):
         clear_output()
-        display(sales,withdrawl_order_id,select)
+        display(sales,withdrawl_order_id,tips,select)
         if sales.value=='无':
             print('请选择业务员ID')
         else:
@@ -594,7 +594,7 @@ def on_btn_qw_clicked(p):
     
     def withdrawl_click(p):
         clear_output()
-        display(sales,withdrawl_order_id,select)
+        display(sales,withdrawl_order_id,tips,select)
         if sales.value=='无':
             print('请选择业务员ID')
         else:
