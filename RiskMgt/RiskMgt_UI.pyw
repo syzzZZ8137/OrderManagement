@@ -17,9 +17,12 @@ from tkinter import *
 from pandastable import Table, TableModel
 import pandas as pd
 
+def update(p):
+    table.clearTable()
+    Login_RskMgt(p)
 
 def Login_RskMgt(p):
-    global res
+    global res,table
     res = GetRiskList.GetOrder(str(RskChosen.get()))
     
     if type(res) == int:
@@ -81,8 +84,16 @@ def Login_RskMgt(p):
                 res_disp.loc[i,'状态'] = '已撤单'
             else:
                 pass
-
+          
+    former_labelframe = labelframe.pack_slaves()
+    for each in former_labelframe:
+        each.destroy()
+        
+    f = Frame(labelframe,width=300)
+    f.pack(fill='both')
+    
     table = pt = Table(f, dataframe=res_disp,width=1700)
+
     #table.grid(row=1,column=1,rowspan=5,columnspan=2)
     table.show()
     
@@ -123,16 +134,19 @@ def RiskJudge(signal,OrderID):
 root = Tk() 
 root.title('国信期货场外期权订单管理系统（后台）')  
 
-f = Frame(root,width=300)
-f.pack(fill='both')
+labelframe = LabelFrame(root, text='OrderListTable')
+labelframe.pack(fill='y')
+
 
 RiskID = GetRiskList.GetRiskList()
 RiskID = RiskID['accountid'].tolist()
 
 global RskChosen,OrderID
 labelframe1 = LabelFrame(root, text='RiskManagerID')
-
 labelframe1.pack(fill='y')
+
+
+
 RskChosen = ttk.Combobox(labelframe1, width=12)
 RskChosen['values'] =  RiskID
 
@@ -143,7 +157,7 @@ button_bg = '#D5E0EE'
 button_active_bg = '#E5E35B'
 
 bt1 = Button(labelframe1,text='Update Data',bg=button_bg, padx=50, pady=3,fg='blue',\
-           command=lambda : Login_RskMgt(0),activebackground = button_active_bg,\
+           command=lambda : update(0),activebackground = button_active_bg,\
            font = tkFont.Font(size=12, weight=tkFont.BOLD))
 bt1.pack(fill='both')
 
