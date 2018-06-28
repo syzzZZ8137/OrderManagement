@@ -4,7 +4,7 @@ Created on Tue Jun 26 08:42:51 2018
 
 @author: Harrison
 """
-import PyMySQLreadZH
+import OrderManagement.PyMySQLreadZH as PyMySQLreadZH
 #%%获取角色列表
 def GetMultiplier(exchange,symbol):
     strall="SELECT * FROM futurexdb.underlying where exchange_symbol='"+exchange+"' and underlying_symbol='"+symbol+"';"

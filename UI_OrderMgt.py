@@ -14,6 +14,9 @@ import OrderManagement.NewOrderRecord as NewOrderRecord
 import OrderManagement.GetOrderList as GetOrderList
 import OrderManagement.GetOrderParam as GetOrderParam
 import OrderManagement.UpdateOrderStatus as UpdateOrderStatus
+import OrderManagement.GetMultiplier as GetMultiplier
+import OrderManagement.Option_Portfolio as OP
+import OrderManagement.MC_Asian_Pricer as MC
 
 #%%
 #香草期权
@@ -164,15 +167,41 @@ def on_btn_ovo_clicked(p):
         icon='check'
     )
     
+    S = widgets.FloatText(
+        description='标的价格:',
+        disabled=False,
+        step=1,  #快捷变换间隔
+
+    )
+    
+    r = widgets.FloatText(
+        value=1,
+        disabled=False,
+        step=0.01,
+        layout=Layout(width='207.5px')
+    )
+    Labelr = widgets.Label(value='无风险利率(%):')
+    Boxr = widgets.HBox([Labelr,r])
+    
+    vol= widgets.BoundedFloatText(
+        description='波动率(%):',
+        disabled=False,
+        step=1,
+        min=0,
+        max=1000000000
+    )
+    
     info_id = widgets.HBox([customer,sales])
     info0 = widgets.HBox([V1,V2,V3])
     info1 = widgets.HBox([price_date,maturity_date])
     info2 = widgets.HBox([exercise_type,option_type])
-    info3 = widgets.HBox([option_price,strike])
+    info3 = widgets.HBox([option_price])
+    info33 = widgets.HBox([S,strike])
+    info333 = widgets.HBox([vol,Boxr])
     info4 = widgets.HBox([quantity,direction])
     
     global order_info
-    order_info = widgets.VBox([info_id,info0,info1,info2,info3,info4])
+    order_info = widgets.VBox([info_id,info0,info1,info2,info3,info33,info333,info4])
     
     
     def submit(p):
@@ -191,6 +220,10 @@ def on_btn_ovo_clicked(p):
             print('请输入期权价格')
         elif strike.value == 0 :
             print('请输入行权价')
+        elif S.value == 0:
+            print('请输入标的价格')
+        elif vol.value == 0:
+            print('请输入波动率')
         elif quantity.value == 0:
             print('请输入期权手数')
         elif customer.value=='无':
@@ -214,12 +247,31 @@ def on_btn_ovo_clicked(p):
             a = CreateOrder.CreateOrder(order_id,'ovo',str(sales.value),paramlist) 
             #print(a)
             
+            multiplier = GetMultiplier.GetMultiplier(EN_EX,EN_cont)
+            multiplier = multiplier['multiplier'].values[0]
+            total_premium = option_price.value*multiplier
+            
+            theo_price = 0
+            tp = exercise_type.value[:2]+'/'+option_type.value[:2]
+            market_property = {'underlying price':S.value,'interest':r.value/100,\
+                               'volatility':vol.value/100,'dividend':0}
+            option_property = {'type':tp,'position':quantity.value*multiplier,\
+                               'strike':strike.value,'maturity':((maturity_date.value - price_date.value).days+1)/365}
+            
+            theo_price = OP.BS_formula(market_property,option_property)
+            
+            
+            
+            
             column2 = ['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity',\
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
-                        'tif', 'trading_type', 'tradingday', 'errorcode']
+                        'tif', 'trading_type', 'tradingday', 'errorcode',\
+                        'theo_volatility','theo_price','total_premium',\
+                        'underlying_price','riskfree_rate']
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\
-                      '0','0',str(price_date.value),'0']]
+                      '0','0',str(price_date.value),'0',str(vol.value/100),str(theo_price),str(total_premium),\
+                      str(S.value),str(r.value/100)]]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
@@ -372,8 +424,16 @@ def on_btn_oao_clicked(p):
         max=1000000000
     )
     
-    quantity= widgets.BoundedIntText(
+    quantity= widgets.BoundedFloatText(
         description='期权手数:',
+        disabled=False,
+        step=1,
+        min=0,
+        max=1000000000
+    )
+    
+    vol= widgets.BoundedFloatText(
+        description='波动率(%):',
         disabled=False,
         step=1,
         min=0,
@@ -404,16 +464,34 @@ def on_btn_oao_clicked(p):
         icon='check'
     )
     
+    S = widgets.FloatText(
+        description='标的价格:',
+        disabled=False,
+        step=1,  #快捷变换间隔
+
+    )
+    
+    r = widgets.FloatText(
+        value=1,
+        disabled=False,
+        step=0.01,
+        layout=Layout(width='207.5px')
+    )
+    Labelr = widgets.Label(value='无风险利率(%):')
+    Boxr = widgets.HBox([Labelr,r])
+    
     info_id = widgets.HBox([customer,sales])
     info0 = widgets.HBox([V1,V2,V3])
     info1 = widgets.HBox([price_date,maturity_date])
     info11 = widgets.HBox([start_fixed_date,end_fixed_date])
     info2 = widgets.HBox([exercise_type,option_type])
-    info3 = widgets.HBox([option_price,strike])
+    info3 = widgets.HBox([option_price])
+    info33 = widgets.HBox([S,strike])
+    info333 = widgets.HBox([vol,Boxr])
     info4 = widgets.HBox([quantity,direction])
     
     global order_info
-    order_info = widgets.VBox([info_id,info0,info1,info11,info2,info3,info4])
+    order_info = widgets.VBox([info_id,info0,info1,info11,info2,info3,info33,info333,info4])
     
     
     def submit(p):
@@ -430,6 +508,10 @@ def on_btn_oao_clicked(p):
             print('请选择合约')
         elif option_price.value == 0:
             print('请输入期权价格')
+        elif S.value == 0:
+            print('请输入标的价格')
+        elif vol.value == 0:
+            print('请输入波动率')
         elif strike.value == 0 :
             print('请输入行权价')
         elif quantity.value == 0:
@@ -446,6 +528,7 @@ def on_btn_oao_clicked(p):
             print('请保证期权起均日在终均日之前')
             
         else:
+            print('下单中，请稍后！')
             op_t = 0 if option_type.value == '看涨(Call)' else 1
             ex_t = 0 if exercise_type.value == '欧式(European)' else 1
             is_buy = 1 if direction.value == '买入' else 0
@@ -462,10 +545,48 @@ def on_btn_oao_clicked(p):
             
             column2 = ['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity',\
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
-                        'tif', 'trading_type', 'tradingday', 'errorcode']
+                        'tif', 'trading_type', 'tradingday', 'errorcode','theo_volatility','theo_price','total_premium',\
+                        'underlying_price','riskfree_rate']
+            
+            #亚式期权回算
+            SA = S.value
+            q = 0
+            Nsamples = 50000
+            Tsamples = (maturity_date.value-price_date.value).days*10
+            theo_price = 0
+            
+            if option_type.value == '看涨(Call)':
+                OT = '亚式/算术平均/看涨/固定'
+            else:
+                OT = '亚式/算术平均/看跌/固定'
+                
+            Ta,Tb,Tc,sit = MC.time_split(price_date.value,start_fixed_date.value,end_fixed_date.value,maturity_date.value)
+            if Ta<=0:
+                print('输入有误！请确认到期日在报价日之后！')
+            elif Tb<0:
+                print('输入有误！请确认到期日在起均日之后！')
+            elif Tc<0:
+                print('输入有误！请确认到期日在终均日之后！')
+            elif Tb<Tc:
+                print('输入有误！请确认终均日在起均日之后！')
+            else:
+                if sit==1:
+                    random = MC.random_gen(Nsamples,Tsamples)
+                    theo_price,se = MC.Asian_Disc_MC(random,S.value,strike.value,Ta,Tb,Tc,sit,r.value/100,vol.value/100,q,SA,
+                                         OT,Nsamples,Tsamples)
+                    
+                    
+                else:
+                    print('输入有误！请确认起均日在报价日之后！')
+                
+            multiplier = GetMultiplier.GetMultiplier(EN_EX,EN_cont)
+            multiplier = multiplier['multiplier'].values[0]
+            total_premium = option_price.value*multiplier
+            
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\
-                      '0','0',str(price_date.value),'0']]
+                      '0','0',str(price_date.value),'0',\
+                      '%f'%(vol.value/100),str(theo_price*quantity.value*multiplier),str(total_premium),str(S.value),str(r.value/100)]]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
@@ -573,8 +694,8 @@ def on_btn_qw_clicked(p):
                     res_disp.loc[i,'期权起均日'] = res2.loc[each,'sett_start_date']
                 if 'sett_end_date' in res2.columns.tolist():
                     res_disp.loc[i,'期权终均日'] = res2.loc[each,'sett_end_date']
-                res_disp.loc[i,'行权方式'] = '欧式(European)' if res2.loc[each,'exercise_type']==0 else '美式(American)'
-                res_disp.loc[i,'期权类型'] = '看涨(Call)' if res2.loc[each,'option_type']==0 else '看跌(Put)'
+                res_disp.loc[i,'行权方式'] = '欧式(European)' if res2.loc[each,'exercise_type']=='0' else '美式(American)'
+                res_disp.loc[i,'期权类型'] = '看涨(Call)' if res2.loc[each,'option_type']=='0' else '看跌(Put)'
                 if each[:3] == 'oao':
                     res_disp.loc[i,'期权类型'] = '亚式(Asian)'+res_disp.loc[i,'期权类型']
                 elif each[:3] == 'ovo':
