@@ -59,8 +59,8 @@ def Login_RskMgt(p):
                 res_disp.loc[i,'期权起均日'] = res2.loc[each,'sett_start_date']
             if 'sett_end_date' in res2.columns.tolist():
                 res_disp.loc[i,'期权终均日'] = res2.loc[each,'sett_end_date']
-            res_disp.loc[i,'行权方式'] = '欧式(European)' if res2.loc[each,'exercise_type']==0 else '美式(American)'
-            res_disp.loc[i,'期权类型'] = '看涨(Call)' if res2.loc[each,'option_type']==0 else '看跌(Put)'
+            res_disp.loc[i,'行权方式'] = '欧式(European)' if res2.loc[each,'exercise_type']=='0' else '美式(American)'
+            res_disp.loc[i,'期权类型'] = '看涨(Call)' if res2.loc[each,'option_type']=='0' else '看跌(Put)'
             if each[:3] == 'oao':
                 res_disp.loc[i,'期权类型'] = '亚式(Asian)'+res_disp.loc[i,'期权类型']
             elif each[:3] == 'ovo':
