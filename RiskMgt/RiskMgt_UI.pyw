@@ -68,7 +68,13 @@ def Login_RskMgt(p):
             else:
                 pass
             
-            res_disp.loc[i,'期权价格'] = res.loc[i,'price']
+            res_disp.loc[i,'销售期权单价'] = res.loc[i,'price']
+            res_disp.loc[i,'理论期权单价'] = res.loc[i,'theo_price']
+            res_disp.loc[i,'销售波动率'] = res.loc[i,'theo_volatility']
+            res_disp.loc[i,'销售期权总价'] = res.loc[i,'total_premium']
+            res_disp.loc[i,'销售标的价格'] = res.loc[i,'underlying_price']
+            res_disp.loc[i,'销售无风险利率'] = res.loc[i,'riskfree_rate']
+            
             res_disp.loc[i,'行权价'] = res2.loc[each,'strike']
             res_disp.loc[i,'期权手数'] = res.loc[i,'quantity']
             res_disp.loc[i,'方向'] = '买入' if res.loc[i,'is_buy']==1 else '卖出'

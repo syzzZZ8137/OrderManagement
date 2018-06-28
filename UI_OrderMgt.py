@@ -120,7 +120,7 @@ def on_btn_ovo_clicked(p):
     )
     
     option_price = widgets.BoundedFloatText(
-        description='期权价格:',
+        description='期权单价:',
         disabled=False,
         step=1,
         min=0,
@@ -217,7 +217,7 @@ def on_btn_ovo_clicked(p):
         elif cont_date == '无':
             print('请选择合约')
         elif option_price.value == 0:
-            print('请输入期权价格')
+            print('请输入期权单价')
         elif strike.value == 0 :
             print('请输入行权价')
         elif S.value == 0:
@@ -255,7 +255,7 @@ def on_btn_ovo_clicked(p):
             tp = exercise_type.value[:2]+'/'+option_type.value[:2]
             market_property = {'underlying price':S.value,'interest':r.value/100,\
                                'volatility':vol.value/100,'dividend':0}
-            option_property = {'type':tp,'position':quantity.value*multiplier,\
+            option_property = {'type':tp,'position':1,\
                                'strike':strike.value,'maturity':((maturity_date.value - price_date.value).days+1)/365}
             
             theo_price = OP.BS_formula(market_property,option_property)
@@ -276,7 +276,7 @@ def on_btn_ovo_clicked(p):
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
             column_disp = ['客户ID','业务员ID','交易所','品种','合约','期权发行日','期权到期日',\
-                           '行权方式','期权类型','期权价格',\
+                           '行权方式','期权类型','期权单价',\
                            '行权价','期权手数','方向']
             data_disp = [[customer.value,sales.value,EN_EX,EN_cont,cont_date,price_date.value,maturity_date.value,\
                         exercise_type.value,option_type.value,option_price.value,\
@@ -409,7 +409,7 @@ def on_btn_oao_clicked(p):
     )
     
     option_price = widgets.BoundedFloatText(
-        description='期权价格:',
+        description='期权单价:',
         disabled=False,
         step=1,
         min=0,
@@ -507,7 +507,7 @@ def on_btn_oao_clicked(p):
         elif cont_date == '无':
             print('请选择合约')
         elif option_price.value == 0:
-            print('请输入期权价格')
+            print('请输入期权单价')
         elif S.value == 0:
             print('请输入标的价格')
         elif vol.value == 0:
@@ -586,12 +586,12 @@ def on_btn_oao_clicked(p):
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\
                       '0','0',str(price_date.value),'0',\
-                      '%f'%(vol.value/100),str(theo_price*quantity.value*multiplier),str(total_premium),str(S.value),str(r.value/100)]]
+                      '%f'%(vol.value/100),str(theo_price),str(total_premium),str(S.value),str(r.value/100)]]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
             column_disp = ['客户ID','业务员ID','交易所','品种','合约','期权报价日','期权到期日',\
-                           '期权起均日','期权终均日','行权方式','期权类型','期权价格',\
+                           '期权起均日','期权终均日','行权方式','期权类型','期权单价',\
                            '行权价','期权手数','方向']
             data_disp = [[customer.value,sales.value,EN_EX,EN_cont,cont_date,price_date.value,maturity_date.value,\
                         start_fixed_date.value,end_fixed_date.value,exercise_type.value,option_type.value,option_price.value,\
@@ -703,7 +703,7 @@ def on_btn_qw_clicked(p):
                 else:
                     pass
                 
-                res_disp.loc[i,'期权价格'] = res.loc[each,'price']
+                res_disp.loc[i,'期权单价'] = res.loc[each,'price']
                 res_disp.loc[i,'行权价'] = res2.loc[each,'strike']
                 res_disp.loc[i,'期权手数'] = res.loc[each,'quantity']
                 res_disp.loc[i,'方向'] = '买入' if res.loc[each,'is_buy']==1 else '卖出'
