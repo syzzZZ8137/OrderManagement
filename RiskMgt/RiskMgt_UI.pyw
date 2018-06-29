@@ -9,6 +9,9 @@ import GetOrderList
 import GetOrderParam
 import UpdateOrderStatus
 import GetRiskList
+import GetRoleName
+import GetTraderId
+import GetPoSymbol
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -22,7 +25,7 @@ def update(p):
     Login_RskMgt(p)
 
 def Login_RskMgt(p):
-    global res,table
+    global res,table,trader
     res = GetRiskList.GetOrder(str(RskChosen.get()))
     
     if type(res) == int:
@@ -31,6 +34,11 @@ def Login_RskMgt(p):
     else:
         res = res[res['status'].isin([1,5,6,14])]
         OrderID['values'] =  res[res['status'].isin([14])]['modelinstance'].tolist()
+        
+        trader = GetTraderId.GetTraderId(str(RskChosen.get()))
+        trader1 = trader['accountid'].apply(lambda x : str(x)+'-')
+        trader1 = trader1+trader['firstname']+trader['lastname']
+        TraderChosen['values'] = trader1.tolist()
         res.reset_index(inplace=True,drop=True)
         
         
@@ -47,9 +55,21 @@ def Login_RskMgt(p):
         for i in range(len(res)):
             each = res.loc[i,'modelinstance']
             res_disp.loc[i,'订单号'] = each
+            
             res_disp.loc[i,'客户ID'] = int(res.loc[i,'customerid'])
+            client = GetRoleName.GetRoleName(str(res_disp.loc[i,'客户ID']))
+            client = client['firstname'].values[0]+client['lastname'].values[0]
+            res_disp.loc[i,'客户姓名'] = client
+            
             res_disp.loc[i,'业务员ID'] = int(res.loc[i,'accountid'])
-            #res_disp.loc[i,'订单状态'] = res.loc[each,'status'] 
+            sales = GetRoleName.GetRoleName(str(res_disp.loc[i,'业务员ID']))
+            sales = sales['firstname'].values[0]+sales['lastname'].values[0]
+            res_disp.loc[i,'业务员姓名'] = sales
+            #res_disp.loc[i,'订单状态'] = res.loc[each,'status']
+            res_disp.loc[i,'已分配交易员'] = res.loc[i,'traderid']
+            res_disp.loc[i,'已分配组合'] = res.loc[i,'portfolio_symbol']
+            
+            
             res_disp.loc[i,'交易所'] = res2.loc[each,'ref_exchange']
             res_disp.loc[i,'品种'] = res2.loc[each,'ref_underlying']
             res_disp.loc[i,'合约'] = res2.loc[each,'ref_contract']
@@ -102,6 +122,13 @@ def Login_RskMgt(p):
 
     #table.grid(row=1,column=1,rowspan=5,columnspan=2)
     table.show()
+
+def Get_Portfolio(p):
+    traderID = str(TraderChosen.get()).split('-')[0]
+    ps = GetPoSymbol.GetPoSymbol(traderID)
+    ps = ps['portfolio_symbol'].tolist()
+    PortfolioChosen['values'] = ps
+    PortfolioChosen.current(0)
     
 def RiskJudge(signal,OrderID):
     isdo = tk.messagebox.askokcancel('Validation', '要执行此操作吗')
@@ -133,9 +160,15 @@ def RiskJudge(signal,OrderID):
                     tk.messagebox.showinfo('Status Update','Invalid Action4')
                 else:
                     tk.messagebox.showinfo('Status Update','Approval Successfully!')
+                    
             else:
                 tk.messagebox.showinfo('Status Update','Invalid Code')
 
+
+def distribute_trader(p):
+    b = UpdateOrderStatus.UpdateOrderStatus('traderid',str(TraderChosen.get()).split('-')[0],OrderID.get())
+    c = UpdateOrderStatus.UpdateOrderStatus('portfolio_symbol',PortfolioChosen.get(),OrderID.get())
+    tk.messagebox.showinfo('Trader Portfolio Distribute','Distribute Successfully!')
 
 root = Tk() 
 root.title('国信期货场外期权订单管理系统（后台）')  
@@ -147,7 +180,7 @@ labelframe.pack(fill='y')
 RiskID = GetRiskList.GetRiskList()
 RiskID = RiskID['accountid'].tolist()
 
-global RskChosen,OrderID
+global RskChosen,OrderID,TraderChosen,PortfolioChosen
 labelframe1 = LabelFrame(root, text='RiskManagerID')
 labelframe1.pack(fill='y')
 
@@ -168,9 +201,12 @@ bt1 = Button(labelframe1,text='Update Data',bg=button_bg, padx=50, pady=3,fg='bl
 bt1.pack(fill='both')
 
 
-l = LabelFrame(root, text='OrderID')
+l = LabelFrame(root, text='Order')
 l.pack(fill='y')
-OrderID = ttk.Combobox(l, width=40)
+
+l1 = LabelFrame(l, text='Order')
+l1.pack(fill='y')
+OrderID = ttk.Combobox(l1, width=40)
 OrderID.pack(fill='both')
 
 bt = Button(l,text='Approval',bg=button_bg, padx=50, pady=3,fg='red',\
@@ -185,6 +221,26 @@ bt = Button(l,text='Reject',bg=button_bg, padx=50, pady=3,fg='green',\
            font = tkFont.Font(size=12, weight=tkFont.BOLD))
 bt.pack(fill='both')
 
+
+ll = LabelFrame(root, text='Trader-Portfolio')
+ll.pack(fill='y')
+
+l2 = LabelFrame(ll, text='Trader')
+l2.pack(fill='y')
+TraderChosen = ttk.Combobox(l2, width=40)
+TraderChosen.pack(fill='both')
+TraderChosen.bind("<<ComboboxSelected>>",Get_Portfolio)
+
+
+l3 = LabelFrame(ll, text='Portfolio')
+l3.pack(fill='y')
+PortfolioChosen = ttk.Combobox(l3, width=40)
+PortfolioChosen.pack(fill='both')
+
+bt = Button(ll,text='Distribute',bg=button_bg, padx=50, pady=3,fg='red',\
+           command=lambda : distribute_trader(0),activebackground = button_active_bg,\
+           font = tkFont.Font(size=12, weight=tkFont.BOLD))
+bt.pack(fill='both')
 
 root.mainloop()
 

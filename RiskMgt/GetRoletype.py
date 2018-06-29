@@ -4,7 +4,7 @@ Created on Wed Jun 13 13:40:19 2018
 
 @author: Harrison
 """
-import OrderManagement.PyMySQLreadZH as PyMySQLreadZH
+import PyMySQLreadZH
 #%%获取角色列表
 def GetRoleType(roletype):
     strall="SELECT * FROM futurexdb.client_terminal where roletype="+roletype+";"
