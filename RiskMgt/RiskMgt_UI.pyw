@@ -32,8 +32,17 @@ def Login_RskMgt(p):
         res_disp = pd.DataFrame()
         #说明提取数据时报错
     else:
-        res = res[res['status'].isin([1,5,6,14])]
+        res = res[res['status'].isin([1,3,5,6,14])]
         OrderID['values'] =  res[res['status'].isin([14])]['modelinstance'].tolist()
+        OrderID2['values'] =  res[res['status'].isin([1])]['modelinstance'].tolist()
+        
+        a = [14,1,5,3]
+        #print(111,is_disp)
+        disp = [x for x in range(len(is_disp)) if is_disp[x] == 1]
+        #print(222,disp)
+        a = [a[x] for x in disp]
+        #print(333,a)
+        res = res[res['status'].isin(a)]
         
         trader = GetTraderId.GetTraderId(str(RskChosen.get()))
         trader1 = trader['accountid'].apply(lambda x : str(x)+'-')
@@ -69,6 +78,18 @@ def Login_RskMgt(p):
             res_disp.loc[i,'已分配交易员'] = res.loc[i,'traderid']
             res_disp.loc[i,'已分配组合'] = res.loc[i,'portfolio_symbol']
             
+            if res.loc[i,'status'] == 14:
+                res_disp.loc[i,'状态'] = '下单成功,等待审阅'
+            elif res.loc[i,'status'] == 6:
+                res_disp.loc[i,'状态'] = '正在审阅'
+            elif res.loc[i,'status'] == 1:
+                res_disp.loc[i,'状态'] = '已通过审阅'
+            elif res.loc[i,'status'] == 5:
+                res_disp.loc[i,'状态'] = '未通过审阅'
+            elif res.loc[i,'status'] == 3:
+                res_disp.loc[i,'状态'] = '已撤单'
+            else:
+                pass
             
             res_disp.loc[i,'交易所'] = res2.loc[each,'ref_exchange']
             res_disp.loc[i,'品种'] = res2.loc[each,'ref_underlying']
@@ -98,18 +119,8 @@ def Login_RskMgt(p):
             res_disp.loc[i,'行权价'] = res2.loc[each,'strike']
             res_disp.loc[i,'期权手数'] = res.loc[i,'quantity']
             res_disp.loc[i,'方向'] = '买入' if res.loc[i,'is_buy']==1 else '卖出'
-            if res.loc[i,'status'] == 14:
-                res_disp.loc[i,'状态'] = '下单成功,等待审阅'
-            elif res.loc[i,'status'] == 6:
-                res_disp.loc[i,'状态'] = '正在审阅'
-            elif res.loc[i,'status'] == 1:
-                res_disp.loc[i,'状态'] = '已通过审阅'
-            elif res.loc[i,'status'] == 5:
-                res_disp.loc[i,'状态'] = '未通过审阅'
-            elif res.loc[i,'status'] == 3:
-                res_disp.loc[i,'状态'] = '已撤单'
-            else:
-                pass
+            
+            res_disp = res_disp.sort_values('状态')
           
     former_labelframe = labelframe.pack_slaves()
     for each in former_labelframe:
@@ -166,9 +177,18 @@ def RiskJudge(signal,OrderID):
 
 
 def distribute_trader(p):
-    b = UpdateOrderStatus.UpdateOrderStatus('traderid',str(TraderChosen.get()).split('-')[0],OrderID.get())
-    c = UpdateOrderStatus.UpdateOrderStatus('portfolio_symbol',PortfolioChosen.get(),OrderID.get())
+    b = UpdateOrderStatus.UpdateOrderStatus('traderid',str(TraderChosen.get()).split('-')[0],OrderID2.get())
+    c = UpdateOrderStatus.UpdateOrderStatus('portfolio_symbol',PortfolioChosen.get(),OrderID2.get())
     tk.messagebox.showinfo('Trader Portfolio Distribute','Distribute Successfully!')
+
+
+def selection():
+    global is_disp
+    is_disp = []
+    for i in range(len(var_lst)):
+        is_disp.append(var_lst[i].get())
+    #print(is_disp)
+
 
 root = Tk() 
 root.title('国信期货场外期权订单管理系统（后台）')  
@@ -180,10 +200,9 @@ labelframe.pack(fill='y')
 RiskID = GetRiskList.GetRiskList()
 RiskID = RiskID['accountid'].tolist()
 
-global RskChosen,OrderID,TraderChosen,PortfolioChosen
+global RskChosen,OrderID,TraderChosen,PortfolioChosen,OrderID2,is_disp
 labelframe1 = LabelFrame(root, text='RiskManagerID')
 labelframe1.pack(fill='y')
-
 
 
 RskChosen = ttk.Combobox(labelframe1, width=12)
@@ -194,6 +213,24 @@ RskChosen.bind("<<ComboboxSelected>>",Login_RskMgt)
 
 button_bg = '#D5E0EE'  
 button_active_bg = '#E5E35B'
+
+#checkbutton
+var_lst = []
+is_disp = [1,0,0,0]
+status = ['下单成功,等待审阅','已通过审阅','未通过审阅','已撤单']
+l4 = LabelFrame(labelframe1, text='Display')
+l4.pack(fill='both')
+for each in status:
+    var = tk.IntVar()
+    checkbt = Checkbutton(l4,text=each,\
+                          variable=var, onvalue=1, offvalue=0,\
+                          command=selection)
+    checkbt.pack(fill='both',side='left')
+    if each == '下单成功,等待审阅':
+        checkbt.select()
+    var_lst.append(var)
+
+
 
 bt1 = Button(labelframe1,text='Update Data',bg=button_bg, padx=50, pady=3,fg='blue',\
            command=lambda : update(0),activebackground = button_active_bg,\
@@ -225,6 +262,11 @@ bt.pack(fill='both')
 ll = LabelFrame(root, text='Trader-Portfolio')
 ll.pack(fill='y')
 
+ll1 = LabelFrame(ll, text='OrderID')
+ll1.pack(fill='y')
+OrderID2 = ttk.Combobox(ll1, width=40)
+OrderID2.pack(fill='both')
+
 l2 = LabelFrame(ll, text='Trader')
 l2.pack(fill='y')
 TraderChosen = ttk.Combobox(l2, width=40)
@@ -241,6 +283,9 @@ bt = Button(ll,text='Distribute',bg=button_bg, padx=50, pady=3,fg='red',\
            command=lambda : distribute_trader(0),activebackground = button_active_bg,\
            font = tkFont.Font(size=12, weight=tkFont.BOLD))
 bt.pack(fill='both')
+
+
+
 
 root.mainloop()
 

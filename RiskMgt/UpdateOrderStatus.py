@@ -4,7 +4,7 @@ Created on Thu Jun 14 09:13:05 2018
 
 @author: Harrison
 """
-import OrderManagement.PyMySQLwrite as PyMySQLwrite
+import PyMySQLwrite
 #%% 更改order_record表中的数据，选定accountid,modelinstance以及要更改的参数名
 def UpdateOrderStatus(changeitem,changevalue,modelinstance):
     strall="UPDATE `futurexdb`.`order_record_otc` SET `"+changeitem+"`='"+changevalue+"' WHERE `modelinstance`='"+modelinstance+"';"

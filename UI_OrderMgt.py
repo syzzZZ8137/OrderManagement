@@ -249,7 +249,7 @@ def on_btn_ovo_clicked(p):
             
             multiplier = GetMultiplier.GetMultiplier(EN_EX,EN_cont)
             multiplier = multiplier['multiplier'].values[0]
-            total_premium = option_price.value*multiplier
+            total_premium = option_price.value*multiplier*quantity.value
             
             theo_price = 0
             tp = exercise_type.value[:2]+'/'+option_type.value[:2]
@@ -581,7 +581,7 @@ def on_btn_oao_clicked(p):
                 
             multiplier = GetMultiplier.GetMultiplier(EN_EX,EN_cont)
             multiplier = multiplier['multiplier'].values[0]
-            total_premium = option_price.value*multiplier
+            total_premium = option_price.value*multiplier*quantity.value
             
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\

@@ -5,7 +5,7 @@ Created on Thu Jun 14 09:32:46 2018
 @author: Harrison
 """
 
-import OrderManagement.PyMySQLreadZH as PyMySQLreadZH
+import PyMySQLreadZH
 def GetOrderParam(accountid,modelinstance):
     strall="SELECT * FROM futurexdb.model_params where accountid='"+accountid+"' and modelinstance='"+modelinstance+"';"
     a=PyMySQLreadZH.dbconn(strall)
