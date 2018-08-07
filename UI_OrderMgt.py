@@ -152,7 +152,7 @@ def on_btn_ovo_clicked(p):
     )
     
     description = widgets.Textarea(
-        placeholder='请输入',
+        placeholder='若组合下单，请备注组合内其他几笔单的情况。',
         description='备注:',
         disabled=False
     )
@@ -453,7 +453,7 @@ def on_btn_oao_clicked(p):
     )
     
     description = widgets.Textarea(
-        placeholder='请输入',
+        placeholder='若组合下单，请备注组合内其他几笔单的情况。',
         description='备注:',
         disabled=False
     )
