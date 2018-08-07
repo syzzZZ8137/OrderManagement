@@ -108,7 +108,7 @@ def Login_RskMgt(p):
                 res_disp.loc[i,'期权类型'] = '香草(Vanilla)'+res_disp.loc[i,'期权类型']
             else:
                 pass
-            
+            res_disp.loc[i,'客户备注'] = res.loc[i,'description']
             res_disp.loc[i,'销售期权单价'] = res.loc[i,'price']
             res_disp.loc[i,'理论期权单价'] = res.loc[i,'theo_price']
             res_disp.loc[i,'销售波动率'] = res.loc[i,'theo_volatility']
