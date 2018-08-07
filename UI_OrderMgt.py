@@ -151,6 +151,12 @@ def on_btn_ovo_clicked(p):
         value = '买入'
     )
     
+    description = widgets.Textarea(
+        placeholder='请输入',
+        description='备注:',
+        disabled=False
+    )
+    
     btn_init = widgets.Button(
         description=u'重置',
         disabled=False,
@@ -199,9 +205,10 @@ def on_btn_ovo_clicked(p):
     info33 = widgets.HBox([S,strike])
     info333 = widgets.HBox([vol,Boxr])
     info4 = widgets.HBox([quantity,direction])
-    
+    info5 = widgets.HBox([description])
+
     global order_info
-    order_info = widgets.VBox([info_id,info0,info1,info2,info3,info33,info333,info4])
+    order_info = widgets.VBox([info_id,info0,info1,info2,info3,info33,info333,info4,info5])
     
     
     def submit(p):
@@ -259,19 +266,16 @@ def on_btn_ovo_clicked(p):
                                'strike':strike.value,'maturity':((maturity_date.value - price_date.value).days+1)/365}
             
             theo_price = OP.BS_formula(market_property,option_property)
-            
-            
-            
-            
+
             column2 = ['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity',\
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
                         'tif', 'trading_type', 'tradingday', 'errorcode',\
                         'theo_volatility','theo_price','total_premium',\
-                        'underlying_price','riskfree_rate']
+                        'underlying_price','riskfree_rate','description']
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\
                       '0','0',str(price_date.value),'0',str(vol.value/100),str(theo_price),str(total_premium),\
-                      str(S.value),str(r.value/100)]]
+                      str(S.value),str(r.value/100),str(description.value)]]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
@@ -448,6 +452,12 @@ def on_btn_oao_clicked(p):
         value = '买入'
     )
     
+    description = widgets.Textarea(
+        placeholder='请输入',
+        description='备注:',
+        disabled=False
+    )
+    
     btn_init = widgets.Button(
         description=u'重置',
         disabled=False,
@@ -489,9 +499,10 @@ def on_btn_oao_clicked(p):
     info33 = widgets.HBox([S,strike])
     info333 = widgets.HBox([vol,Boxr])
     info4 = widgets.HBox([quantity,direction])
+    info5 = widgets.HBox([description])
     
     global order_info
-    order_info = widgets.VBox([info_id,info0,info1,info11,info2,info3,info33,info333,info4])
+    order_info = widgets.VBox([info_id,info0,info1,info11,info2,info3,info33,info333,info4,info5])
     
     
     def submit(p):
@@ -546,7 +557,7 @@ def on_btn_oao_clicked(p):
             column2 = ['accountid', 'modelinstance', 'customerid', 'riskid', 'price', 'quantity',\
                        'is_buy', 'exec_type', 'status','quantity_filled', 'is_open',\
                         'tif', 'trading_type', 'tradingday', 'errorcode','theo_volatility','theo_price','total_premium',\
-                        'underlying_price','riskfree_rate']
+                        'underlying_price','riskfree_rate','description']
             
             #亚式期权回算
             SA = S.value
@@ -586,7 +597,7 @@ def on_btn_oao_clicked(p):
             data2 = [[str(sales.value),order_id,'%d'%customer.value,'14001',str(option_price.value),str(quantity.value),\
                       str(is_buy),'9','14','0','0',\
                       '0','0',str(price_date.value),'0',\
-                      '%f'%(vol.value/100),str(theo_price),str(total_premium),str(S.value),str(r.value/100)]]
+                      '%f'%(vol.value/100),str(theo_price),str(total_premium),str(S.value),str(r.value/100),str(description.value)]]
             infolist = pd.DataFrame(data2,columns=column2)
             b = NewOrderRecord.NewOrderRecord(infolist)          
             
